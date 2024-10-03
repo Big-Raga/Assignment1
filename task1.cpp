@@ -148,7 +148,7 @@ class CLL{
         //if the list is not empty
         if(!isEmpty()){
             //setting the temporary node to the head
-            node* temp = first;
+            node* temp = first;            
             
             //looping through the list until we reach the head
             do{
@@ -156,6 +156,11 @@ class CLL{
                 if(temp->isExecuted()){
                     //if the node is the first and last node
                     if(temp == first && temp == first->next){
+                        first->next = nullptr;
+                        first->previous = nullptr;
+
+                        delete temp;
+                        temp = nullptr;
                         first = nullptr;
                     }
                     //if the node is not the first node
