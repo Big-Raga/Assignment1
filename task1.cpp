@@ -2,10 +2,12 @@
 #include <string>
 using namespace std;
 
+// Global process number variable
+int processNumber = 1;
+
 //creating a class for nodes
 class node{
     public:
-    static  int processNumber;
     int process_id;
     string name;
     int execution_time;
@@ -15,21 +17,23 @@ class node{
     node* previous;
 
     //constructor for the node
-    node(string p_name, int execution_time){
+    node(string p_name, int Time){
         process_id = processNumber++;
         name = p_name;
-        execution_time = execution_time;
-        remaining_time = execution_time;
+        execution_time = Time;
+        remaining_time = Time;
         next = nullptr;
         previous = nullptr;
     }
 
     //fucntion to check if process has been executed
     bool isExecuted(){
-        remaining_time <=0;
+       return  remaining_time <=0;
     }    
 
 };
+
+
 
 //creating a class for a linked list
 class CLL{
@@ -47,50 +51,8 @@ class CLL{
     bool isEmpty(){
         return first == nullptr;
     }
-    
-
-    //function to check if a new process has arrived
-    void checkArrival(int size){
-        int difference = length - size;
-
-        //if the previous lenght is less than the actual length than a new process has arrived
-        if(size < length){
-            //starting with the last process
-            node* temp = first->previous;
-
-            //iterates through each newly arrived process
-            for (int i = 0; i < difference; i++) {
-                cout<<"New process arrives: " << temp->name <<" (Remaining: " << temp->execution_time << ")"<<endl;
-            }
-        
-        }
-
-    }
 
 
-     //function to print  the processes
-     void ListOutAllProcesses(){
-        if(!isEmpty()){
-            //setting the temporary node to the head
-            node* temp = first;
-
-            do{
-                //printing the data of each node
-                cout<< "Process ID: "<< temp->process_id <<"\nName: "<< temp->name <<"\nExecution Time: "<< temp->execution_time
-                 <<"\nRemaining Time: "<< temp->remaining_time <<endl <<endl;
-
-                //updating the temporary node to the next node
-                temp = temp->next;
-                
-            }while (temp != first);
-            
-            cout<<endl;
-        }
-        else{
-             cout<<"List is empty" <<endl;
-            }
-    }
-     
 
      //function to print initial processes
      void ListInitialProcesses(){
@@ -101,21 +63,71 @@ class CLL{
             cout<<"Initial Processes: [" ;
             do{
                 //printing each node
-                if(temp == first->next){
-                    cout<< "(" << temp->name << "," << temp->execution_time << ")]\n\n";
+                if(temp == first->previous){
+                    cout<< "(" << temp->name << "," << temp->execution_time << ")]\n";
                     break;
                 }
                 else{
                     cout<< "(" << temp->name << "," << temp->execution_time << "), ";
                 }   
+
+                temp = temp->next;
                 
-            }while(true);
+            }while(temp != first);
         }
         else{
              cout<<"List is empty" <<endl;
          }
     }      
 
+    //function to print the processes as they are being executed
+    void ListExecutingProcesses(int cycle, int cycleNumber){
+        if(!isEmpty()){
+            //setting the temporary node to the head
+            node* temp = first;
+
+
+            cout << "Cycle " << cycleNumber << ": ";
+
+            do {
+                //updating the time remaining
+                temp->remaining_time -= cycle;
+
+                //printing the status of the current process
+                cout << temp->name << " (Remaining: ";
+                
+                //check if the process is completed or still executing
+                if (temp->remaining_time <= 0) {
+                    cout << "Completes";
+                } else {
+                    cout << temp->remaining_time;
+                }
+                
+                //check if we are at the last process
+                if(temp == first->previous){
+                    cout << ")";
+                }
+                else{
+                    cout << "), ";
+                }
+
+                //move to the next node
+                temp = temp->next;
+
+            } while (temp != first);
+            
+            cout << endl;
+        } else {
+            cout << "No processes in the list." << endl;
+        }
+    }
+
+
+     //fucntion to add a new process
+     void addProcess(string name, int time){
+        addTask(time, name);
+        cout << "New process arrives: "<< name << " (Remaining: "<< time << ")" << endl;
+     }
 
     //function to add nodes to the list
     void addTask(int time, string name){
@@ -156,41 +168,77 @@ class CLL{
                 if(temp->isExecuted()){
                     //if the node is the first and last node
                     if(temp == first && temp == first->next){
-                        first->next = nullptr;
-                        first->previous = nullptr;
 
                         delete temp;
-                        temp = nullptr;
                         first = nullptr;
+                        return;
                     }
                     //if the node is not the first node
-                    else if(temp!= first){
+                    else if(temp == first){
+                        //updating the links of the previous and next nodes
+                        first->previous->next = first->next;
+                        first->next->previous = first->previous;
+                        first = first->next;
+                    }       
+                    else{
                         //updating the links of the previous and next nodes
                         temp->previous->next = temp->next;
                         temp->next->previous = temp->previous;
-                    }       
+                    }
+
+                    node* toDelete = temp;
+                    temp = temp->next;
+                    delete toDelete;
+                    length--;
                  }
-            }while(temp!= first);
+                 else{
+                    temp = temp->next;
+                }
+            }while(temp!= first && length>0);  
 
         }
     }
 
     void ExecuteProcesses(int cycle){
 
+        int counter = 1; 
 
-    }
+        //printing the initaial prcoces.
+        ListInitialProcesses();
+        cout<<"CPU Time per Process per cycle: " << cycle << endl;
 
-    
+        //while loop runs until all processes are completed
+        while (!isEmpty()) {
+            if(counter == 3){
+                 //adding a new process after the 2nd cycle
+                 addProcess("P4",9);
+             }
+             
+            //printing the executing processes
+            ListExecutingProcesses(cycle,counter); 
 
-    
 
-    
+             //deleting all completed processes
+             deleteAllCompletedProcesses();
+             counter ++;
+        }
+        cout << "All processes have been completed." << endl;
+        
+    } 
 
 };
 
 // Main function to test the ArrayList class
 int main() {
     CLL CPUProcesses;
+
+    // Add initial processes
+    CPUProcesses.addTask(10, "P1");
+    CPUProcesses.addTask(5, "P2");
+    CPUProcesses.addTask(8, "P3");
+
+    // Execute processes with 3 units of time per cycle
+    CPUProcesses.ExecuteProcesses(3);
 
     
     return 0;
