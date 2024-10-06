@@ -228,7 +228,7 @@ class CLL{
 
 };
 
-// Main function to test the function
+// Main function to test the code
 int main() {
     CLL CPUProcesses;
 
