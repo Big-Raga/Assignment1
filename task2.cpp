@@ -580,10 +580,7 @@ public:
         return result;
     }
 
-    // function to divide two large numberspair<LargeNumber, LargeNumber> Division(LargeNumber &divisor) {
-    //  Initializing a large number to store the quotient and the remainder
-
-    // function to increaese or decrease value of the dividend accoriding to the divisor
+    
   // matches the number of digits in divisor to an initial segment of the dividend string
     LargeNumber MatchDigits(LargeNumber &divisor, std::string &strDividend) {
         std::string temp = "";
@@ -671,7 +668,7 @@ public:
         return std::make_pair(quotient, remainder);
     }
 
-  // Function for modular exponentiation
+  //function for modular exponentiation
     long long modularExponentiation(long long base, long long exponent, long long mod) {
         long long result = 1;
         base = base % mod;
@@ -686,7 +683,7 @@ public:
         return result;
     }
 
-    // Function to check if the LargeNumber is prime
+    //function to check if the LargeNumber is prime
     bool isPrime(int k) {
         // Edge cases
         if (listlength == 0 || (listlength == 1 && head->value < 2)) return false; // 0 and 1 are not prime
