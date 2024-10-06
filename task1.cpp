@@ -228,7 +228,7 @@ class CLL{
 
 };
 
-// Main function to test the ArrayList class
+// Main function to test the function
 int main() {
     CLL CPUProcesses;
 
